@@ -1,21 +1,36 @@
 import React from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Platform, Image } from 'react-native';
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { View, TextInput, StyleSheet, ScrollView } from 'react-native';
+import { FAB } from 'react-native-paper';  // Import FAB from react-native-paper
+import ProfileCard from '@/components/ProfileCard';
 
 export default function HomeScreen() {
   return (
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <View style={styles.searchContainer}>
+          <TextInput 
+            style={styles.searchBox} 
+            placeholder="Search..."
+            placeholderTextColor="#888"
+          />
+        </View>
 
-      <View style={styles.searchContainer}>
-        <TextInput 
-          style={styles.searchBox} 
-          placeholder="Search..."
-          placeholderTextColor="#888"
+        <ProfileCard
+          imageSource={require('@/assets/images/icon.png')}
+          name="Jane Smith"
+          description="A short description of Jane"
         />
-      </View>
+      </ScrollView>
 
+      {/* Floating Action Button */}
+      <FAB
+        style={styles.fab}
+        icon={ require("@/assets/images/favicon.png")}  // You can use any icon from react-native-paper icons
+        onPress={() => {
+          console.log("Floating action button pressed");
+        }}
+      />
+    </View>
   );
 }
 
@@ -33,30 +48,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 50,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  fab: {
     position: 'absolute',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  button: {
-    padding: 10,
-    backgroundColor: '#A1CEDC',
-    borderRadius: 5,
+    bottom: 100,  // Adjusted position to keep it away from the screen edge
+    right: 10,    // Positioned at the right side
+    width: 60,    // Width of the FAB (circle size)
+    height: 60,   // Height of the FAB (circle size)
+    borderRadius: 30,  // Half of the width/height to make it round
+    backgroundColor: '#6200ee',  // Custom color for the FAB button
+    justifyContent: 'center',  // Ensure the content is centered
+    alignItems: 'center',     // Ensure the icon is centered
   },
 });
