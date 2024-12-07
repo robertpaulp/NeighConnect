@@ -9,9 +9,11 @@ import {
   Image,
   Modal,
   FlatList,
+  Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { addIssue } from '@/backend/api/strapi';
 
 const IssueForm = () => {
   const [title, setTitle] = useState('');
@@ -19,17 +21,28 @@ const IssueForm = () => {
   const [date, setDate] = useState(new Date());
   const [image, setImage] = useState(null);
   const [category, setCategory] = useState('');
-  const [themes, setThemes] = useState('');
-  const [storyOutput, setStoryOutput] = useState('');
+  const [location, setLocation] = useState('');
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const handleSubmit = () => {
-    setStoryOutput('Your AI-generated story will appear here.');
+  // Function to handle form submission
+  const handleSubmit = async () => {
+    try {
+      // Call addIssue function from strapi.js
+      const result = await addIssue(title, description, date, category, location, image);
+      console.log('Issue created successfully:', result);
+      Alert.alert('Success', 'Issue added successfully');
+    } catch (error) {
+      console.error('Error submitting issue:', error);
+      Alert.alert('Error', 'There was an issue submitting the form');
+    }
   };
 
   const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setDate(currentDate);
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
   };
 
   const selectImage = () => {
@@ -51,14 +64,14 @@ const IssueForm = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}> Add your Issue </Text>
+      <Text style={styles.header}>Add your Issue</Text>
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Title</Text>
         <TextInput
           style={styles.input}
           placeholder="Tell us about your problem"
-          placeholderTextColor={'#D0D0D0'}
+          placeholderTextColor="#D0D0D0"
           value={title}
           onChangeText={setTitle}
         />
@@ -69,35 +82,49 @@ const IssueForm = () => {
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder="Explain how that problem is affecting you"
-          placeholderTextColor={'#D0D0D0'}
+          placeholderTextColor="#D0D0D0"
           value={description}
           onChangeText={setDescription}
           multiline
         />
       </View>
 
+      {/* Date and Photo Row */}
       <View style={styles.row}>
+        {/* Date Picker */}
         <View style={styles.flexItem}>
           <Text style={styles.label}>Date</Text>
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={onChangeDate}
-          />
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={styles.dateButtonText}>
+              {date.toLocaleDateString()}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={onChangeDate}
+            />
+          )}
         </View>
 
+        {/* Photo Upload */}
         <View style={styles.flexItem}>
           <Text style={styles.label}>Photo</Text>
           <TouchableOpacity style={styles.uploadButton} onPress={selectImage}>
             <Text style={styles.uploadButtonText}>
-              {image ? 'Change Photo' : 'Upload Photo File'}
+              {image ? 'Change Photo' : 'Upload Photo'}
             </Text>
           </TouchableOpacity>
           {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
         </View>
       </View>
 
+      {/* Category Selection */}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Category</Text>
         <TouchableOpacity
@@ -110,6 +137,7 @@ const IssueForm = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Category Modal */}
       <Modal
         transparent
         visible={categoryModalVisible}
@@ -144,16 +172,18 @@ const IssueForm = () => {
         </View>
       </Modal>
 
+      {/* Location Input */}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Location</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter the location of the issue"
-          value={themes}
-          onChangeText={setThemes}
+          value={location}
+          onChangeText={setLocation}
         />
       </View>
 
+      {/* Submit Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
@@ -174,7 +204,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 16,
-    marginTop: 40,
+    marginTop: 80,
+    textAlign: 'center', 
   },
   inputGroup: {
     marginBottom: 16,
@@ -200,21 +231,39 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center', 
     marginBottom: 16,
   },
   flexItem: {
     flex: 1,
     marginRight: 8,
   },
-  uploadButton: {
+  dateButton: {
     backgroundColor: '#ddd',
-    padding: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#ccc',
+    marginTop: 8,
+  },
+  dateButtonText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  uploadButton: {
+    backgroundColor: '#ddd',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#ccc',
+    marginTop: 8,
   },
   uploadButtonText: {
     color: '#000',
@@ -248,7 +297,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   modalItem: {
-    padding: 12,
+    padding: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     width: '100%',
@@ -273,16 +322,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   button: {
+    marginTop: 50,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    borderRadius: 12,  // Adjust the border radius for more rounded corners
+    paddingVertical: 12,
+    paddingHorizontal: 10,  // Adjust padding to match other inputs
     borderWidth: 1,
     borderColor: '#ccc',
+    width: '100%',  // Ensure it takes full width like the input fields
   },
+  
   buttonText: {
     color: '#000',
     fontSize: 16,
+    textAlign: 'center', // Center the text in the button
   },
 });
 
