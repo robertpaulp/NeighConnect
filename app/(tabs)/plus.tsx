@@ -1,109 +1,138 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View, Dimensions } from 'react-native';
+import { IconSymbol } from '@/components/ui/IconSymbol'; // Assuming IconSymbol is the icon component
+import { ThemedText } from '@/components/ThemedText'; // Assuming you're using ThemedText for consistent styling
+import { LineChart } from 'react-native-chart-kit';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+// Independent ProfileIcon Component
+const ProfileIcon = () => (
+  <View style={styles.profileContainer}>
+    <IconSymbol
+      name="person.circle.fill" // Profile icon
+      size={120} // Larger profile icon
+      color="#4C8C99" // A different color for the profile icon
+      style={styles.profileIcon} // Custom style to add circular border
+    />
+  </View>
+);
 
 export default function TabTwoScreen() {
+  // Sample data for the chart (initial values are set to 0)
+  const data = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], // Months
+    datasets: [
+      {
+        data: [200, 400, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Data points initialized to 0
+      },
+    ],
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
+    <View style={styles.container}>
+      {/* Name Text at the top */}
+      <ThemedText style={styles.nameText}>Rares Carbunaru</ThemedText>
+
+      {/* Profile Icon (Independent component) */}
+      <ProfileIcon />
+
+      {/* Edit Profile Button */}
+      <TouchableOpacity style={styles.editButton}>
+        <IconSymbol 
+          name="pencil" // Icon for editing (can be changed as needed)
+          size={24}
+          color="#fff" 
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+      </TouchableOpacity>
+
+      {/* Text below the edit button */}
+      <ThemedText style={styles.textBelowButton}>
+        Tap to edit your profile details
+      </ThemedText>
+
+      {/* Graph at the bottom */}
+      <View style={styles.chartContainer}>
+        <LineChart
+          data={data}
+          width={Dimensions.get('window').width - 40} // Chart width, with padding on sides
+          height={220} // Chart height
+          chartConfig={styles.chartConfig}
+          bezier // This makes the graph lines smooth
+          withHorizontalLabels={true}
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    backgroundColor: '#f7f7f7', // Light background color for the whole screen
+    justifyContent: 'flex-start', // Align everything to the top
+    alignItems: 'center', // Center items horizontally
+    paddingTop: 100, // Add some space at the top for better layout
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  nameText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333', // Darker color for the name text
+    marginBottom: 20, // Space between name and profile icon
+  },
+  profileContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15, // Space below the profile icon
+  },
+  profileIcon: {
+    borderWidth: 4,
+    borderColor: '#A1CEDC', // Border color for the profile icon
+    borderRadius: 60, // Making the icon circular
+    padding: 0, // Padding to create space between the icon and the border
+  },
+  editButton: {
+    backgroundColor: '#A1CEDC',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 30, // Rounded button for a softer look
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4, // Slight shadow effect for the button
+    marginBottom: 5, // Space between the button and the text
+  },
+  textBelowButton: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#666', // Lighter text color for the description
+    marginTop: 10, // Add some space above the text
+  },
+  chartContainer: {
+    marginTop: 30, // Margin at the top for spacing between the button and the chart
+    alignSelf: 'center', // Center the chart horizontally
+  },
+  chartConfig: {
+    backgroundColor: '#f7f7f7', // Light background for the chart
+    backgroundGradientFrom: '#A1CEDC', // Gradient color for the chart
+    backgroundGradientTo: '#A1CEDC', // Gradient color for the chart
+    decimalPlaces: 0, // Display no decimal points for data values
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // White line and points
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // White labels
+    style: {
+      borderRadius: 10, // Rounded corners for the chart
+    },
+    propsForLabels: {
+      dx: -30, // Increase space between the x-axis labels
+      
+    },
+    // Adjust the space between y-axis labels and make them fit well
+    propsForYAxisLabels: {
+      dx: -15, // Move the y-axis labels more to the left
+      dy: 0, // Keep them aligned properly vertically
+    },
+    paddingLeft: 10, // Add padding to the left of the chart to fit the y-axis labels
+    paddingRight: 20, // Add padding to the right of the chart to balance the spacing
   },
 });
