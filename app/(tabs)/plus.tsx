@@ -1,8 +1,7 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View, Dimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, ScrollView, Text } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol'; // Assuming IconSymbol is the icon component
 import { ThemedText } from '@/components/ThemedText'; // Assuming you're using ThemedText for consistent styling
-import { LineChart } from 'react-native-chart-kit';
 
 // Independent ProfileIcon Component
 const ProfileIcon = () => (
@@ -16,17 +15,115 @@ const ProfileIcon = () => (
   </View>
 );
 
-export default function TabTwoScreen() {
-  // Sample data for the chart (initial values are set to 0)
-  const data = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], // Months
-    datasets: [
-      {
-        data: [200, 400, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Data points initialized to 0
-      },
-    ],
-  };
+// Contribution data for the entire year, divided into weeks (each value represents a level of contribution)
+const contributionData = {
+  Jan: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+    // Add more weeks if necessary
+  ],
+  Feb: [
+    [0, 0, 1, 2, 1, 1, 0],
+    [1, 1, 2, 0, 0, 1, 1],
+    [0, 1, 1, 2, 0, 1, 2],
+    [0, 1, 2, 0, 3, 1, 0],
+    // Add more weeks if necessary
+  ],
+  Mar: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  Apr: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  May: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  June: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  July: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  Aug: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  Sept: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  Oct: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  Nov: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
+  ],
+  Dec: [
+    [0, 1, 2, 3, 0, 1, 2], // Week 1
+    [0, 1, 2, 0, 1, 2, 3], // Week 2
+    [0, 1, 0, 3, 2, 1, 2], // Week 3
+    [1, 1, 2, 0, 3, 1, 0], 
+    [1, 1, 1],// Week 4
 
+  ],
+  // Add data for other months (Mar-Dec)
+  // ...
+};
+
+// Enhanced color function with a better gradient
+const getColorForContributions = (value) => {
+  switch (value) {
+    case 0:
+      return '#ebedf0'; // No contribution
+    case 1:
+      return '#c6e48b'; // Low
+    case 2:
+      return '#7bc96f'; // Medium
+    case 3:
+      return '#196127'; // High
+    default:
+      return '#ebedf0';
+  }
+};
+
+export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
       {/* Name Text at the top */}
@@ -49,17 +146,41 @@ export default function TabTwoScreen() {
         Tap to edit your profile details
       </ThemedText>
 
-      {/* Graph at the bottom */}
-      <View style={styles.chartContainer}>
-        <LineChart
-          data={data}
-          width={Dimensions.get('window').width - 40} // Chart width, with padding on sides
-          height={220} // Chart height
-          chartConfig={styles.chartConfig}
-          bezier // This makes the graph lines smooth
-          withHorizontalLabels={true}
-        />
-      </View>
+      {/* Contribution Graph */}
+      <ScrollView 
+        showsVerticalScrollIndicator={false} // Hide the vertical scroll indicator
+        contentContainerStyle={styles.verticalGridContainer}>
+        
+        <View style={styles.contributionContainer}>
+          {/* Months and Contribution Grid */}
+          <View style={styles.monthsContainer}>
+            {Object.keys(contributionData).map((month, monthIndex) => (
+              <View key={monthIndex} style={styles.monthRow}>
+                {/* Month Label */}
+                <Text style={styles.monthText}>{month}</Text>
+
+                {/* Weeks */}
+                <View style={styles.weeksContainer}>
+                  {contributionData[month].map((week, weekIndex) => (
+                    <View key={weekIndex} style={styles.weekRow}>
+                      {week.map((day, dayIndex) => (
+                        <View
+                          key={dayIndex}
+                          style={[
+                            styles.gridCell,
+                            { backgroundColor: getColorForContributions(day) }, // Dynamically set color
+                          ]}
+                        />
+                      ))}
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+
     </View>
   );
 }
@@ -68,71 +189,82 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#f7f7f7', // Light background color for the whole screen
-    justifyContent: 'flex-start', // Align everything to the top
-    alignItems: 'center', // Center items horizontally
-    paddingTop: 100, // Add some space at the top for better layout
+    backgroundColor: '#f7f7f7',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingTop: 100,
   },
   nameText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333', // Darker color for the name text
-    marginBottom: 20, // Space between name and profile icon
+    color: '#333',
+    marginBottom: 20,
   },
   profileContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 15, // Space below the profile icon
+    marginBottom: 15,
   },
   profileIcon: {
     borderWidth: 4,
-    borderColor: '#A1CEDC', // Border color for the profile icon
-    borderRadius: 60, // Making the icon circular
-    padding: 0, // Padding to create space between the icon and the border
+    borderColor: '#A1CEDC',
+    borderRadius: 60,
   },
   editButton: {
     backgroundColor: '#A1CEDC',
     paddingVertical: 14,
     paddingHorizontal: 40,
-    borderRadius: 30, // Rounded button for a softer look
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 6,
-    elevation: 4, // Slight shadow effect for the button
-    marginBottom: 5, // Space between the button and the text
+    elevation: 4,
+    marginBottom: 10,
   },
   textBelowButton: {
     textAlign: 'center',
     fontSize: 16,
-    color: '#666', // Lighter text color for the description
-    marginTop: 10, // Add some space above the text
+    color: '#666',
+    marginTop: 10,
   },
-  chartContainer: {
-    marginTop: 30, // Margin at the top for spacing between the button and the chart
-    alignSelf: 'center', // Center the chart horizontally
+  verticalGridContainer: {
+    marginTop: 20,
+    paddingHorizontal: 15, // Adjust padding for overall alignment
   },
-  chartConfig: {
-    backgroundColor: '#f7f7f7', // Light background for the chart
-    backgroundGradientFrom: '#A1CEDC', // Gradient color for the chart
-    backgroundGradientTo: '#A1CEDC', // Gradient color for the chart
-    decimalPlaces: 0, // Display no decimal points for data values
-    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // White line and points
-    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // White labels
-    style: {
-      borderRadius: 10, // Rounded corners for the chart
-    },
-    propsForLabels: {
-      dx: -30, // Increase space between the x-axis labels
-      
-    },
-    // Adjust the space between y-axis labels and make them fit well
-    propsForYAxisLabels: {
-      dx: -15, // Move the y-axis labels more to the left
-      dy: 0, // Keep them aligned properly vertically
-    },
-    paddingLeft: 10, // Add padding to the left of the chart to fit the y-axis labels
-    paddingRight: 20, // Add padding to the right of the chart to balance the spacing
+  contributionContainer: {
+    flexDirection: 'column',
+  },
+  monthsContainer: {
+    flexDirection: 'column',
+  },
+  monthRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15, // Create spacing between months
+  },
+  monthText: {
+    width: 50, // Ensure uniform width for month labels
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'right',
+    marginRight: 10, // Space between month label and grid
+  },
+  weeksContainer: {
+    flexDirection: 'row', // Arrange weeks horizontally
+  },
+  weekRow: {
+    flexDirection: 'row',
+    marginBottom: 2,
+  },
+  gridCell: {
+    width: 18,
+    height: 18,
+    margin: 1.5, // Ensure consistent spacing between cells
+    borderRadius: 3,
+    backgroundColor: '#ebedf0', // Default color for no contribution
   },
 });
+
