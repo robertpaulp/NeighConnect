@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: 10,
     fontSize: 16,
+    marginTop: 50,
   },
   titleContainer: {
     flexDirection: 'row',
