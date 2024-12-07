@@ -7,15 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }
-    >
+
       <View style={styles.searchContainer}>
         <TextInput 
           style={styles.searchBox} 
@@ -24,34 +16,6 @@ export default function HomeScreen() {
         />
       </View>
 
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}><ThemedText>Home</ThemedText></TouchableOpacity>
-        <TouchableOpacity style={styles.button}><ThemedText>Icon</ThemedText></TouchableOpacity>
-        <TouchableOpacity style={styles.button}><ThemedText>Plus</ThemedText></TouchableOpacity>
-        <TouchableOpacity style={styles.button}><ThemedText>Profile</ThemedText></TouchableOpacity>
-      </View>
-    </ParallaxScrollView>
   );
 }
 
