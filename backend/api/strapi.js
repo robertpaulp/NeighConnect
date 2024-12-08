@@ -1,5 +1,8 @@
 const apiUrl = 'http://10.200.22.17:13339/api/issues';
+const apiHome = 'http://192.168.1.5:13339/api/issues'; // Your API URL
 
+
+// Function to add an issue
 // Function to add an issue
 export const addIssue = async (title, description, date, category, location, image) => {
   try {
@@ -19,26 +22,29 @@ export const addIssue = async (title, description, date, category, location, ima
       const imageFile = {
         uri: imageUri,
         name: imageName,
-        type: `image/${fileType}`,
+        type: `image/${fileType}`,  // Adjust MIME type based on file extension
       };
-      formData.append('files.image', imageFile);
+      formData.append('files.photo', imageFile);  // Use 'files.photo' or 'files.image' based on your setup
     }
 
     // Use Fetch API to send the data to the Strapi backend
-    const response = await fetch(apiUrl, {
+    const response = await fetch(apiHome, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'multipart/form-data', // This is important for FormData
-      },
-      body: formData,
+      body: formData,  // Let FormData handle the Content-Type header
     });
 
+    // Log the response body for debugging
+    const responseBody = await response.json();
+    console.log('Strapi Response:', responseBody);
+
+    // Check if response is okay
     if (!response.ok) {
-      throw new Error('Failed to create the issue.');
+      throw new Error(`Failed to create the issue. Response: ${JSON.stringify(responseBody)}`);
     }
 
-    const result = await response.json();
-    return result; // Return the result from Strapi
+    // Return the result from Strapi
+    return responseBody;
+
   } catch (error) {
     console.error('Error submitting issue:', error);
     throw error; // Re-throw error to handle it in the component

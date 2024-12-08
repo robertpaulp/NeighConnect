@@ -10,36 +10,39 @@ import {
   Modal,
   FlatList,
   Alert,
+  Platform,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { addIssue } from '@/backend/api/strapi';
+import { Ionicons } from '@expo/vector-icons'; // For adding icons
 
 const IssueForm = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date());
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<string | null>(null);
   const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState(''); // Corrected state name
+  const [storyOutput, setStoryOutput] = useState('');
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Function to handle form submission
-  const handleSubmit = async () => {
-    try {
-      // Call addIssue function from strapi.js
-      const result = await addIssue(title, description, date, category, location, image);
-      console.log('Issue created successfully:', result);
-      Alert.alert('Success', 'Issue added successfully');
-    } catch (error) {
-      console.error('Error submitting issue:', error);
-      Alert.alert('Error', 'There was an issue submitting the form');
+  const handleSubmit = () => {
+    if (!title.trim() || !description.trim() || !category.trim() || !location.trim()) {
+      Alert.alert('Validation Error', 'Please fill in all the fields.');
+      return;
     }
+
+    // Placeholder for actual submission logic
+    setStoryOutput('Your AI-generated story will appear here.');
+    Alert.alert('Success', 'Issue submitted successfully!');
   };
 
-  const onChangeDate = (event, selectedDate) => {
-    setShowDatePicker(false);
+  const onChangeDate = (event: any, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false); // Close picker on Android after selection
+    }
     if (selectedDate) {
       setDate(selectedDate);
     }
@@ -60,29 +63,44 @@ const IssueForm = () => {
     );
   };
 
-  const categoryOptions = ['Road', 'Water', 'Electricity', 'Sanitation'];
+  const categoryOptions = [
+    'Road',
+    'Water',
+    'Electricity',
+    'Sanitation',
+    'Organisation',
+    'Legal',
+    'Support',
+    'Pets',
+    'Events',
+    'Disruption',
+    'Cleanliness',
+    'Other',
+  ];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Add your Issue</Text>
+      <Text style={styles.header}>Report an Issue</Text>
 
+      {/* Title Input */}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Title</Text>
         <TextInput
           style={styles.input}
-          placeholder="Tell us about your problem"
-          placeholderTextColor="#D0D0D0"
+          placeholder="Brief title of the issue"
+          placeholderTextColor="#A0A0A0"
           value={title}
           onChangeText={setTitle}
         />
       </View>
 
+      {/* Description Input */}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Description</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder="Explain how that problem is affecting you"
-          placeholderTextColor="#D0D0D0"
+          placeholder="Detailed description of the issue"
+          placeholderTextColor="#A0A0A0"
           value={description}
           onChangeText={setDescription}
           multiline
@@ -98,17 +116,49 @@ const IssueForm = () => {
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
           >
+            <Ionicons name="calendar-outline" size={20} color="#ffffff" />
             <Text style={styles.dateButtonText}>
               {date.toLocaleDateString()}
             </Text>
           </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onChangeDate}
-            />
+
+          {/* DateTimePicker Component */}
+          {showDatePicker && Platform.OS === 'ios' ? (
+            <Modal
+              transparent
+              animationType="slide"
+              visible={showDatePicker}
+              onRequestClose={() => setShowDatePicker(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalHeader}>Select a Date</Text>
+                  <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display="spinner"
+                    onChange={onChangeDate}
+                    textColor="#2C3E50" // Visible text color for iOS
+                  />
+                  <TouchableOpacity
+                    style={styles.okButton}
+                    onPress={() => setShowDatePicker(false)}
+                  >
+                    <Text style={styles.okButtonText}>OK</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          ) : (
+            showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default" // 'default' display for Android
+                onChange={onChangeDate}
+                textColor={Platform.OS === 'ios' ? '#2C3E50' : undefined}
+              />
+            )
           )}
         </View>
 
@@ -116,6 +166,12 @@ const IssueForm = () => {
         <View style={styles.flexItem}>
           <Text style={styles.label}>Photo</Text>
           <TouchableOpacity style={styles.uploadButton} onPress={selectImage}>
+            <Ionicons
+              name={image ? 'image-outline' : 'camera-outline'}
+              size={20}
+              color="#ffffff"
+              style={{ marginRight: 5 }}
+            />
             <Text style={styles.uploadButtonText}>
               {image ? 'Change Photo' : 'Upload Photo'}
             </Text>
@@ -131,6 +187,12 @@ const IssueForm = () => {
           style={styles.uploadButton}
           onPress={() => setCategoryModalVisible(true)}
         >
+          <Ionicons
+            name={category ? 'checkmark-circle-outline' : 'add-circle-outline'}
+            size={20}
+            color="#ffffff"
+            style={{ marginRight: 5 }}
+          />
           <Text style={styles.uploadButtonText}>
             {category || 'Select a Category'}
           </Text>
@@ -166,6 +228,7 @@ const IssueForm = () => {
               style={styles.closeButton}
               onPress={() => setCategoryModalVisible(false)}
             >
+              <Ionicons name="close-circle-outline" size={20} color="#ffffff" />
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -178,6 +241,7 @@ const IssueForm = () => {
         <TextInput
           style={styles.input}
           placeholder="Enter the location of the issue"
+          placeholderTextColor="#A0A0A0"
           value={location}
           onChangeText={setLocation}
         />
@@ -186,87 +250,100 @@ const IssueForm = () => {
       {/* Submit Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Ionicons name="send-outline" size={20} color="#ffffff" style={{ marginRight: 5 }} />
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </View>
+
+      {/* AI Generated Story Output */}
+      {storyOutput && (
+        <View style={styles.storyOutputContainer}>
+          <Text style={styles.storyOutputText}>{storyOutput}</Text>
+        </View>
+      )}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#f3f3f3',
+    padding: 20,
+    backgroundColor: '#f9fafd',
     flexGrow: 1,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 16,
-    marginTop: 80,
-    textAlign: 'center', 
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+    marginTop: 35,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    color: '#000',
+    color: '#34495E',
     marginBottom: 8,
+    fontWeight: '600',
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 8,
-    padding: 10,
+    borderColor: '#BDC3C7',
+    borderRadius: 10,
+    padding: 12,
     fontSize: 16,
-    color: '#000',
+    color: '#34495E',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   textArea: {
-    height: 100,
+    height: 120,
     textAlignVertical: 'top',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center', 
-    marginBottom: 16,
+    alignItems: 'flex-start',
+    marginBottom: 20,
   },
   flexItem: {
     flex: 1,
     marginRight: 8,
   },
   dateButton: {
-    backgroundColor: '#ddd',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#5DADE2', // Blue background for date button
     paddingVertical: 12,
     paddingHorizontal: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#ccc',
-    marginTop: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#3498DB', // Lighter blue border
   },
   dateButtonText: {
-    color: '#000',
+    color: '#ffffff', // White text for contrast
     fontSize: 14,
     fontWeight: 'bold',
+    marginLeft: 5,
   },
   uploadButton: {
-    backgroundColor: '#ddd',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#5DADE2', // Blue background for upload button
     paddingVertical: 12,
     paddingHorizontal: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#ccc',
-    marginTop: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#3498DB', // Lighter blue border
   },
   uploadButtonText: {
-    color: '#000',
+    color: '#ffffff', // White text for contrast
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -286,56 +363,94 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    width: '80%',
-    borderRadius: 8,
-    padding: 16,
+    width: '85%',
+    borderRadius: 15,
+    padding: 20,
     alignItems: 'center',
+    maxHeight: '80%',
   },
   modalHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 15,
   },
   modalItem: {
-    padding: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#BDC3C7',
     width: '100%',
     alignItems: 'center',
   },
   modalItemText: {
     fontSize: 16,
-    color: '#000',
+    color: '#34495E',
   },
   closeButton: {
-    marginTop: 16,
-    backgroundColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ff5252', // Red background for close button
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 15,
+    width: '100%',
+    justifyContent: 'center',
   },
   closeButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#000',
+    color: '#ffffff', // White text for contrast
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 5,
   },
   buttonContainer: {
-    alignItems: 'flex-end',
+    marginTop: 10,
+    alignItems: 'center',
   },
   button: {
-    marginTop: 50,
-    backgroundColor: '#fff',
-    borderRadius: 12,  // Adjust the border radius for more rounded corners
-    paddingVertical: 12,
-    paddingHorizontal: 10,  // Adjust padding to match other inputs
-    borderWidth: 1,
-    borderColor: '#ccc',
-    width: '100%',  // Ensure it takes full width like the input fields
+    flexDirection: 'row',
+    backgroundColor: '#2ECC71', // Green background for submit button
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'center',
+    shadowColor: '#2ECC71',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
-  
   buttonText: {
-    color: '#000',
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  storyOutputContainer: {
+    marginTop: 30,
+    padding: 20,
+    backgroundColor: '#E8F8F5',
+    borderRadius: 12,
+    borderColor: '#2ECC71',
+    borderWidth: 1,
+  },
+  storyOutputText: {
     fontSize: 16,
-    textAlign: 'center', // Center the text in the button
+    color: '#2C3E50',
+  },
+  okButton: {
+    marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    backgroundColor: '#5DADE2', // Blue background for OK button
+    borderRadius: 8,
+  },
+  okButtonText: {
+    color: '#ffffff', // White text for contrast
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

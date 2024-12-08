@@ -1,22 +1,22 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ImageSourcePropType } from 'react-native';
+import { View, Text, Image, StyleSheet, ImageSourcePropType, TouchableOpacity } from 'react-native';
 
 interface ProfileCardProps {
   imageSource: ImageSourcePropType;
   name: string;
   description: string;
-
+  onPress: () => void;  // Add the onPress function as a prop
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ imageSource, name, description }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ imageSource, name, description, onPress }) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress}> {/* Wrap in TouchableOpacity for onPress */}
       <Image source={imageSource} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -25,13 +25,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
+    padding: 20,
+    borderRadius: 50,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5, // For Android shadow effect
-    marginBottom: 15, // Space between cards
+    marginBottom: 5, // Space between cards
   },
   image: {
     width: 50,
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
     flex: 1, // Ensure text takes the rest of the space
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '800',
     color: '#333',
   },
   description: {
