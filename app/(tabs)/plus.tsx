@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Independent ProfileIcon Component
-const ProfileIcon = ({ imageUri }) => (
+const ProfileIcon = ({ imageUri }: { imageUri: string | null }) => (
   <View style={styles.profileContainer}>
     {imageUri ? (
       <Image source={{ uri: imageUri }} style={styles.profileImage} />

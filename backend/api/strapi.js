@@ -1,5 +1,5 @@
 const apiUrl = 'http://10.200.22.17:13339/api/issues';
-const apiHome = 'http://192.168.1.5:13339/api/issues'; // Your API URL
+const apiHome = 'http://10.40.5.151:13339/api/issues';
 
 
 // Function to add an issue

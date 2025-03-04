@@ -6,7 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';  // Import SplashScreen from
 
 SplashScreen.preventAutoHideAsync();  // Prevent the splash screen from auto-hiding
 
-const apiHome = 'http://192.168.1.5:13339/api/issues';
+const apiHome = 'http://10.40.5.151:13339/api/issues';
+
 
 export default function HomeScreen() {
   interface Issue {
